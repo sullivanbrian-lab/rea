@@ -29,6 +29,7 @@ import {
   navigationContextInputSchema,
   processComparisonInputSchema,
   getEvidenceBundleInputSchema,
+  searchEvidenceInputSchema,
   verifyUnknownResolutionInputSchema,
 } from "./sessionToolSchemas.js";
 import { examplesFor } from "./toolContractHelpers.js";
@@ -167,6 +168,11 @@ export const SESSION_TOOL_CONTRACTS = [
     "get_evidence_bundle",
     "Return every retained Evidence record and residual unknown as a complete canonical bundle by default. detail=summary discovers retained records without copying or transferring their payloads; optionally filter by exact Evidence ID, operation, target SHA-256, analysis-profile digest or canonical native procedure address. Metadata distinguishes complete record retention from native value-flow truncation or unavailable/unknown coverage. Use a discovered evidence_id with inspect_analysis_view without restarting a provider. Filters apply only to summary delivery.",
     getEvidenceBundleInputSchema,
+  ),
+  session(
+    "search_evidence",
+    "Full-text search across retained session Evidence with a literal or regex pattern, like a scoped notebook search over the ledger. filters select the searched corpus by exact Evidence ID, operation, target SHA-256, analysis-profile digest or canonical native procedure address, matching get_evidence_bundle summary selection. fields restricts which record fields the text index covers, e.g. subject.name for title-only. Every matching record reports its hit fields with occurrence counts and a bounded snippet around the first hit, so hits carry their field location. offset and limit page matched records in stable bundle order; matching_records counts all matches and next_offset is null at exhaustion. Read-only; it never repeats analysis, resolves providers, or treats absence as proof.",
+    searchEvidenceInputSchema,
   ),
   {
     ...session(

@@ -12,6 +12,7 @@ import type { ArtifactResourceScope } from "../artifacts/ArtifactResourceScope.j
 import { err, ok } from "../domain/result.js";
 import { AnalysisCancelledError } from "../domain/analysisErrorCore.js";
 import { inspectEvidenceBundle } from "../application/investigation/InspectEvidenceBundle.js";
+import { searchEvidenceBundle } from "../domain/evidenceRecordSearch.js";
 import { toolRegistrationOptions } from "./toolRegistrationOptions.js";
 import { withAdmittedAnalysis } from "./analysisAdmission.js";
 import { runAdmittedToolOperation } from "./admittedToolOperation.js";
@@ -29,6 +30,7 @@ interface EvidenceToolRegistration {
   readonly snapshotContract: ReturnType<
     typeof toolContract<"get_evidence_bundle">
   >;
+  readonly searchContract: ReturnType<typeof toolContract<"search_evidence">>;
 }
 
 /** Register evidence bundle import and export tools. */
@@ -38,6 +40,7 @@ export const registerEvidenceTools = (
   registerExportEvidenceTool(registration);
   registerImportEvidenceTool(registration);
   registerSnapshotEvidenceTool(registration);
+  registerSearchEvidenceTool(registration);
 };
 
 const registerExportEvidenceTool = ({
@@ -85,6 +88,22 @@ const registerSnapshotEvidenceTool = ({
       server.delivery.toCallToolResult(
         inspectEvidenceBundle(session.immutableEvidenceBundle(), input),
         snapshotContract,
+      ),
+  );
+};
+
+const registerSearchEvidenceTool = ({
+  server,
+  session,
+  searchContract,
+}: EvidenceToolRegistration): void => {
+  server.registerTool(
+    searchContract.name,
+    toolRegistrationOptions(searchContract),
+    (input) =>
+      server.delivery.toCallToolResult(
+        searchEvidenceBundle(session.immutableEvidenceBundle(), input),
+        searchContract,
       ),
   );
 };

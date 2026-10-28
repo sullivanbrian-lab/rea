@@ -561,6 +561,19 @@ not infer correspondence from position or display names.
 
 Exports preserve an existing destination unless `--overwrite` is explicit.
 
+Search a bundle's retained records like a scoped notebook search — a literal or
+regex pattern, optional exact scope filters shared with
+`inspect-evidence-bundle` summary selection, and optional field restriction:
+
+```bash
+rea search-evidence '{"path":"/absolute/path/to/evidence/bundle.json","pattern":"authorization failed"}' --json
+rea search-evidence '{"path":"/absolute/path/to/bundle.json","pattern":"license","filters":{"operation":"analyze_function"},"fields":["subject.name"]}' --json
+```
+
+Every matching record reports its hit fields with occurrence counts and a
+bounded snippet, grouped in stable bundle order; `offset` and `limit` page the
+matched records. The search is read-only and never repeats analysis.
+
 Atomic Evidence output stages on the selected destination's filesystem. If the
 OS pathname ceiling prevents its internal staging name, REA retries in a shorter
 ancestor on that same filesystem and removes the unused stage. Existing output

@@ -7,6 +7,7 @@ import { processTraceSpecificationSchema } from "../domain/process/processTraceS
 import { evidenceSchema } from "../domain/evidence.js";
 import { prefixedDigestSchema } from "./../domain/digests.js";
 import { evidenceRecordFiltersSchema } from "../domain/evidenceRecordSummary.js";
+import { evidenceSearchInputSchema } from "../domain/evidenceRecordSearch.js";
 import { residualUnknownSchema } from "../domain/residualUnknown.js";
 
 /** Complete retained Evidence, or selected discovery metadata without payloads. */
@@ -14,6 +15,9 @@ export const getEvidenceBundleInputSchema = z.strictObject({
   detail: z.enum(["complete", "summary"]).default("complete"),
   filters: evidenceRecordFiltersSchema.optional(),
 });
+
+/** Scoped full-text query over retained Evidence records. */
+export const searchEvidenceInputSchema = evidenceSearchInputSchema;
 
 /** Optional document selection for volatile navigation context. */
 export const navigationContextInputSchema = z.strictObject({

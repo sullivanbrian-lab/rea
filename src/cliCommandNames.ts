@@ -83,6 +83,7 @@ export const CLI_COMMANDS = Object.freeze({
   listFridaProcesses: "list-frida-processes",
   instrumentWithFrida: "instrument-with-frida",
   inspectEvidenceBundle: "inspect-evidence-bundle",
+  searchEvidence: "search-evidence",
   inspectFirmwareRegions: "inspect-firmware-regions",
   extractFirmware: "extract-firmware",
   inspectAndroidPackage: "inspect-android-package",

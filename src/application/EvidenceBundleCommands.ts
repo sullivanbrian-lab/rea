@@ -35,6 +35,8 @@ import {
   writeEvidenceBundle,
 } from "./EvidenceBundleFiles.js";
 import { inspectEvidenceBundle } from "./investigation/InspectEvidenceBundle.js";
+import { searchEvidenceBundle } from "../domain/evidenceRecordSearch.js";
+import type { EvidenceSearchQuery } from "../domain/evidenceRecordSearch.js";
 import type { EvidenceRecordFilters } from "../domain/evidenceRecordSummary.js";
 import { inspectAnalysisViewValidated } from "./analysisView/AnalysisViewService.js";
 
@@ -311,6 +313,26 @@ export const inspectEvidenceBundleCommand = async (
       return loaded.ok ? inspectEvidenceBundle(loaded.value, input) : loaded;
     },
     "get_evidence_bundle",
+    signal,
+  );
+};
+
+/** Scoped full-text search over a standalone bundle's retained records. */
+export const searchEvidenceBundleCommand = async (
+  input: EvidenceSearchQuery & { readonly path: string },
+  signal?: AbortSignal,
+) => {
+  return withBundleReadResources(
+    async (resources) => {
+      const loaded = await readEvidenceBundle(
+        input.path,
+        signal,
+        resources,
+        "search_evidence",
+      );
+      return loaded.ok ? searchEvidenceBundle(loaded.value, input) : loaded;
+    },
+    "search_evidence",
     signal,
   );
 };

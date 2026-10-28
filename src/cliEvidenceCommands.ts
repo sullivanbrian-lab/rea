@@ -9,10 +9,14 @@ import {
   compareEvidenceBundlesCommand,
   exportEvidenceBundleCommand,
   importEvidenceBundleCommand,
+  searchEvidenceBundleCommand,
 } from "./application/EvidenceBundleCommands.js";
 import { logCliCommand } from "./cliLogging.js";
 import type { Logger } from "pino";
 import { CLI_COMMANDS } from "./cliCommandNames.js";
+import { parseCliJsonInput } from "./cliJsonInput.js";
+import { evidenceSearchInputSchema } from "./domain/evidenceRecordSearch.js";
+import { importEvidenceBundleInputSchema } from "./contracts/sessionToolSchemas.js";
 import type { JsonValue } from "./domain/jsonValue.js";
 import { projectAnalysisError } from "./domain/analysisErrorProjection.js";
 import type { AnalysisError } from "./domain/analysisErrorBase.js";
@@ -111,6 +115,42 @@ export const registerEvidenceCommands = (
             signal,
           });
           return compared.ok ? compared.value : cliError(compared.error);
+        }),
+      ),
+  });
+  cli.command(CLI_COMMANDS.searchEvidence, {
+    description:
+      "Search a local Evidence bundle's retained records with a literal or regex pattern and optional exact scope filters",
+    args: z.object({
+      inputJson: z
+        .string()
+        .describe(
+          "JSON or JSON file with absolute path, search pattern and optional filters, fields, offset and limit",
+        ),
+    }),
+    run: ({ args }) =>
+      withCommandCancellation((signal) =>
+        logCliCommand(logger, CLI_COMMANDS.searchEvidence, async () => {
+          const input = await parseCliJsonInput(
+            args.inputJson,
+            CLI_COMMANDS.searchEvidence,
+            signal,
+          );
+          if (!input.ok) return input.error;
+          const schema = evidenceSearchInputSchema.safeExtend({
+            path: importEvidenceBundleInputSchema.shape.path,
+          });
+          const parsed = schema.safeParse(input.value);
+          if (!parsed.success)
+            return cliError(
+              analysisInputErrorFromIssues(
+                CLI_COMMANDS.searchEvidence,
+                parsed.error.issues,
+                input.value,
+              ),
+            );
+          const result = await searchEvidenceBundleCommand(parsed.data, signal);
+          return result.ok ? result.value : cliError(result.error);
         }),
       ),
   });

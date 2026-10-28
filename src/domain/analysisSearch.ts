@@ -25,6 +25,25 @@ export const literalSubstringPredicate = (
 };
 
 /**
+ * Compile the search contract's pattern: an escaped literal substring by
+ * default, or a Unicode regular expression, case-insensitive unless requested.
+ * An invalid pattern is the caller's input error.
+ */
+export const analysisSearchRegExp = (
+  query: Pick<AnalysisSearchQuery, "pattern" | "mode" | "case_sensitive">,
+): RegExp => {
+  const source =
+    query.mode === "regex"
+      ? query.pattern
+      : query.pattern.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
+  try {
+    return new RegExp(source, query.case_sensitive ? "u" : "iu");
+  } catch (cause: unknown) {
+    throw new AnalysisInputError("search", { cause });
+  }
+};
+
+/**
  * Match names the way the search contract describes: a literal substring by
  * default, or a Unicode regular expression, case-insensitive unless requested.
  * An invalid pattern is the caller's input error.
@@ -33,12 +52,7 @@ export const analysisSearchPredicate = (
   query: AnalysisSearchQuery,
 ): ((value: string) => boolean) => {
   if (query.mode === "regex") {
-    let regex: RegExp;
-    try {
-      regex = new RegExp(query.pattern, query.case_sensitive ? "u" : "iu");
-    } catch (cause: unknown) {
-      throw new AnalysisInputError("search", { cause });
-    }
+    const regex = analysisSearchRegExp(query);
     return (value) => regex.test(value);
   }
   return literalSubstringPredicate(query.pattern, query.case_sensitive);

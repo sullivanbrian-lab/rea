@@ -38,6 +38,7 @@ import { z } from "zod";
 import { jsonRecordSchema } from "../domain/jsonRecord.js";
 import { byteSearchResultSchema } from "../domain/native/bytePattern.js";
 import { evidenceBundleSummarySchema } from "../domain/evidenceRecordSummary.js";
+import { evidenceSearchResultSchema } from "../domain/evidenceRecordSearch.js";
 import { liveBinaryTargetSummaryVariants } from "../domain/liveBinaryTargetSummary.js";
 import { nativeFunctionAnnotationsSchema } from "../domain/native/nativeFunctionAnnotations.js";
 import { nativeLoadImageSchema } from "../domain/native/nativeLoadImage.js";
@@ -565,6 +566,7 @@ export const sessionOutputSchemas = {
   get_evidence_bundle: lifecycleResultOf(
     z.union([evidenceBundleSchema, evidenceBundleSummarySchema]),
   ),
+  search_evidence: lifecycleResultOf(evidenceSearchResultSchema),
   get_navigation_context: lifecycleResultOf(
     z.object({
       document: z.string(),

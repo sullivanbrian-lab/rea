@@ -301,6 +301,18 @@ unknown metadata. Missing omission counts remain null. Summary output carries
 every matching record; actual transport admission still applies. Omitted
 `detail` preserves complete canonical bundle delivery; filters require summary.
 
+`search_evidence` answers "where did I see this text" over the same retained
+records: a literal or regex `pattern` searched across each record's searchable
+fields, scoped by the same exact `filters` as summary selection (omit for every
+record). `fields` restricts which record fields are covered, e.g.
+`subject.name` for a title-only search; omit for every searchable field. Each
+matching record returns its hit fields with occurrence counts and a bounded
+snippet around the first hit, grouped in stable bundle order. `offset`/`limit`
+page matched records; `matching_records` counts all matches, `total_matches`
+counts field hits across them, and `next_offset` is null at exhaustion. The
+search is read-only; it never repeats analysis and absence of a hit is a
+bounded negative, not proof.
+
 `list_unknowns` returns every matching current head by default. For a smaller
 inline response, supply `offset` and `limit`, then follow `next_offset` until it
 is null. `total` counts all matching heads; each page preserves complete records

@@ -292,6 +292,7 @@ export const registerSessionTools = (
   const compareFunctionsContract = toolContract("compare_functions");
   const compareBundlesContract = toolContract("compare_bundles");
   const snapshotContract = toolContract("get_evidence_bundle");
+  const searchContract = toolContract("search_evidence");
   const processResources = new ProcessCaptureResourceScope();
   server.registerTool(
     openBundleResourcesContract.name,
@@ -374,6 +375,7 @@ export const registerSessionTools = (
     exportContract,
     importContract,
     snapshotContract,
+    searchContract,
   });
   registerProcessTools({
     server,
